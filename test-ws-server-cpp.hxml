@@ -1,0 +1,11 @@
+-cp src
+-cp src/BinaryData
+-cp src/SlimeProtocol
+-cp src/SlimeProtocol/SlimeData
+-cp src/SlimeProtocol/SlimePacket
+-cp src/SlimeWebSocket
+-cp src/SlimeWebSocket/ServerWebSocket
+-cp test
+-debug
+-main TestWsServer
+-cpp out/server

@@ -10,11 +10,12 @@ class TestWsServer {
             }
 
             c.OnReady = function () {
-                c.Send (new TestPacket ());
+                
             }
 
             c.OnData = function (data : BinaryData) {                
                 protocol.AddBytes (data);
+                c.Send (new TestPacket ());
             }
             c.OnClose = function () {
                 trace ("CLOSED");

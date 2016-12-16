@@ -11,7 +11,6 @@ import haxe.crypto.BaseCode;
 enum HandlerState {
     HANDSHAKE;
     WORK;
-    CLOSED;
 }
 
 /**
@@ -107,6 +106,11 @@ class InternalHandler {
     private var _protocol : SlimeProtocol;
 
     /**
+        When client send close frame
+    **/
+    public var OnClose : Socket -> Void;
+
+    /**
         Decode hex string to Bytes
     **/
     private function decode (str : String) {
@@ -195,8 +199,8 @@ class InternalHandler {
 
         switch (_frameType) {
             case FrameType.CLOSE: {
-                if (_clientHandler.OnClose != null) _clientHandler.OnClose ();
-                _state = HandlerState.CLOSED;
+                if (_clientHandler.OnClose != null) _clientHandler.OnClose ();       
+                OnClose (_socket);         
             }
             case FrameType.BINARY: {                
                 var mask = binaryData.Cut (0, MASK_SIZE);
@@ -218,33 +222,22 @@ class InternalHandler {
     /**
         Process work data from client
     **/
-    private function ProcessWork () : Void {
+    private function ProcessWork () : Void {        
         switch (_workState) {
             case WorkState.FRAME_TYPE: ProcessFrame ();
             case WorkState.LENGTH: ProcessLength ();
-            case WorkState.DATA: ProcessData ();
-        }
+            case WorkState.DATA: ProcessData ();            
+        }        
     }
 
     /*
-    *   Process client request
+    *   Process client data
     */
-    private function RequestHandler () : Void {
-        Thread.readMessage (true);        
-
-        _workState = WorkState.FRAME_TYPE;        
-
-        try {
-            while (true) {
-                switch (_state) {
-                    case HandlerState.HANDSHAKE: ProcessHandshake ();
-                    case HandlerState.WORK: ProcessWork ();
-                    case HandlerState.CLOSED: return;
-                }
-            }
-        } catch (e : Dynamic) {
-            trace (e);                                
-        }
+    public function ProcessClientData () : Void {                           
+        switch (_state) {
+            case HandlerState.HANDSHAKE: ProcessHandshake ();
+            case HandlerState.WORK: ProcessWork ();
+        }        
     }
 
     /*
@@ -253,21 +246,11 @@ class InternalHandler {
     public function new (c : Socket) {
         _socket = c;
         _clientHandler = new ClientHandler (this);
-        _state = HandlerState.HANDSHAKE;      
+        _state = HandlerState.HANDSHAKE; 
+        _workState = WorkState.FRAME_TYPE;     
         _headers = new Map<String, String> ();
-        _protocol = new SlimeProtocol ();
+        _protocol = new SlimeProtocol ();        
     }
-
-    /**
-        Start process data
-    **/
-    public function Start () : Void {
-        if (_clientHandler.OnData == null) throw "Wrong handler";
-        if (_clientHandler.OnReady == null) throw "Wrong handler";
-
-        var requestThread = Thread.create (RequestHandler);
-        requestThread.sendMessage ("");
-    }    
 
     /**
         Return client handler
@@ -281,20 +264,10 @@ class InternalHandler {
     **/
     public function Send (packet : SlimePacket) : Void {
         var data = _protocol.PacketToBinaryData (packet);
-        var mask = BinaryData.RandomBytes (4);
-
         var frame = new BinaryData ();
         frame.AddUint8 (0x82);  // FIN, BINARY
-        frame.AddUint8 (data.Length () ^ 0x80);
-        frame.AddArray (mask);        
-                
-        for (i in 0...data.Length ()) {
-            var j = i % 4;
-            var b = data.GetUint8 (i);
-            var d = b ^ mask[j];
-            frame.AddUint8 (d);
-        }
-                
+        frame.AddUint8 (data.Length ());             
+        frame.AddBinaryData (data);        
         _socket.output.write (frame.ToBytes ());
     }
 }

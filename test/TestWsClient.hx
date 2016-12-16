@@ -7,11 +7,12 @@ class TestWsClient {
        var client = new ClientWebSocket ("localhost");
        client.OnOpen = function () {
            client.Send (new TestPacket ());
+           client.Send (new TestPacket ());
        }
 
        client.OnPacket = function (packet : SlimePacket) {
            var d = cast (packet, TestPacket);
-           trace (d.);
+           trace (d.x);           
        }
 
        client.Open ();       

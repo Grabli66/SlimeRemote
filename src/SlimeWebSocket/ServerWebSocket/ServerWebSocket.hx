@@ -1,5 +1,6 @@
 import sys.net.Socket;
 import sys.net.Host;
+import cpp.net.Poll;
 
 /**
     Handler for accept
@@ -13,7 +14,7 @@ class ServerWebSocket {
     /**
         Max Connections to listen
     **/
-    public static inline var DEFAULT_CONNECTIONS : Int = 10;
+    public static inline var DEFAULT_CONNECTIONS : Int = 1000;
 
     /**
         Server socket
@@ -38,14 +39,25 @@ class ServerWebSocket {
         Start socket
     **/
     public function Start () {
-        _socket.bind (new Host("localhost"), SlimeProtocol.DEFAULT_PORT);
+        // TODO: bind to some IP
+        _socket.bind (new Host("localhost"), SlimeProtocol.DEFAULT_PORT);                
+        _socket.setBlocking (false);
         _socket.listen (DEFAULT_CONNECTIONS);
 
+        var poll = new Poll(1);
+        var serverList = new Array<Socket> ();
+        serverList.push (_socket);
+        poll.prepare (serverList, []);
+        
         while (true) {
-            var client = _socket.accept ();
-            var internalHandler = new InternalHandler (client);
-            _onAccept (internalHandler.GetClientHandler ());
-            internalHandler.Start ();
+            var readyServer = poll.poll (serverList, 0.5);
+            if (readyServer.length > 0) {
+                var client = readyServer[0].accept ();                
+                var internal = new InternalHandler (client);
+                client.custom = internal;
+                _onAccept (internal.GetClientHandler ());
+                WorkerPool.GetInstance ().AddClient (client);
+            }
         }
     }
 }

@@ -88,7 +88,7 @@ class PollWorker {
     /**
         Add new client
     **/
-    public function AddClient (sock : Socket) : Void {                
+    public function AddClient (sock : Socket) : Void {
         if (IsReady) {
             var handler:InternalHandler = sock.custom;
             handler.OnClose = CloseSocket;

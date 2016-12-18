@@ -1,20 +1,36 @@
 /**
-    Abstract packet
+    Class for macro build
 **/
+@:autoBuild(PacketMacro.build ())
 class SlimePacket {
     /**
-        Return data tag
-        For override     
+        Get name of packet
+        To override by macros
     **/
-    public function GetTag () : Int {
-        throw "Not implemented";
+    public function GetName () : String {
+        return "SlimePacket";
     }
 
     /**
-        Parse SlimePacket to SlimeData
-        For override
+        Array of values with type info
+        To override by macros
     **/
-    public function ToData () : Array<SlimeData> {
-        throw "Not implemented";
+    public function GetValues () : Array<ValueInfo> {
+        return null;
     }
-}   
+
+    /**
+        Array of field names
+        To override by macros
+    **/
+    public function GetNames () : Array<VarInfo> {
+        return null;
+    }
+
+    /**
+        Constructor
+    **/
+    public function new () {
+       // SlimePacketParser.Register (this);
+    }
+}

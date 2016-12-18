@@ -13,15 +13,6 @@ class SlimeProtocol {
     **/  
     private var _buffer : BinaryData;
 
-    /**
-        Data parser
-    **/
-    private var _dataParser : SlimeDataParser;
-
-    /**
-        Packet parser
-    **/
-    private var _packetParser : SlimePacketParser;
 
     /**
         Length of packet
@@ -38,8 +29,8 @@ class SlimeProtocol {
     */
     private function ProcessPacket (data : Array<SlimeData>) : Void {
         try {
-            var pack = _packetParser.FromData (data);
-            OnPacket (pack);
+           /* var pack = _packetParser.FromData (data);
+            OnPacket (pack);*/
         } catch (e : Dynamic) {
             trace (e);
         }
@@ -49,8 +40,8 @@ class SlimeProtocol {
     * Process buffer data
     */
     private function ProcessData () : Void {        
-        var slimeData = _dataParser.FromBinaryData (_buffer);
-        ProcessPacket (slimeData);        
+       /* var slimeData = _dataParser.FromBinaryData (_buffer);
+        ProcessPacket (slimeData);        */
     }
 
     /**
@@ -58,17 +49,15 @@ class SlimeProtocol {
     **/
     public function new () {        
         _buffer = new BinaryData ();
-        _dataParser = SlimeDataParser.GetInstance ();
-        _packetParser = SlimePacketParser.GetInstance ();
     }
 
     /**
         Parse packet to binary data with length
     **/
     public function PacketToBinaryData (packet : SlimePacket) : BinaryData {
-        var dat = _packetParser.ToData (packet);
-        var bd = _dataParser.ToBinaryData (dat);        
-        return bd;
+        
+        //return bd;
+        return new BinaryData ();
     }
 
     /**

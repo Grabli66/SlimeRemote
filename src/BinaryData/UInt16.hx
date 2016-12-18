@@ -1,10 +1,10 @@
 #if !cpp
     abstract UInt16 (Int) to Int {
-        public inline function new (v : Int) {
+        public inline function new (v : Int) {            
             this = v & 0xFFFF;
         }
 
-        @:from static inline function FromInt (v : Int) : UInt16 {
+        @:from static inline function FromInt (v : Int) : UInt16 {            
             return new UInt16 (v);
         }
 

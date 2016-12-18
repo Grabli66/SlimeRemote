@@ -1,8 +1,7 @@
 package;
 
 class TestWsServer {
-    private static function TestServerWs () {
-        SlimePacketParser.GetInstance ().Register (TestPacket.TYPE, TestPacket.FromData);
+    private static function TestServerWs () {        
         var wss = new ServerWebSocket (function (c : ClientHandler) {
             var protocol = new SlimeProtocol ();
             protocol.OnPacket = function (packet : SlimePacket) {

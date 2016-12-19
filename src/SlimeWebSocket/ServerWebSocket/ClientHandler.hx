@@ -23,7 +23,7 @@ class ClientHandler {
     /**
         Emits when client sent data        
     **/
-    public var OnData : BinaryData -> Void;
+    public var OnPacket : SlimePacket -> Void;
 
     /**
         Emits on some error

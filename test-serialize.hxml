@@ -9,4 +9,4 @@
 -cp test/Packets
 -lib hxbit
 -main TestSerialize
--js bin.js
+-cpp out/serialize

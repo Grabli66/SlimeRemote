@@ -6,6 +6,7 @@
 -cp src/SlimeWebSocket
 -cp src/SlimeWebSocket/ServerWebSocket
 -cp test
+-cp test/Packets
 -debug
 -main TestWsServer
 -cpp out/server

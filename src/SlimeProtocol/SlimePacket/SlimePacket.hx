@@ -1,8 +1,9 @@
 /**
     Class for macro build
 **/
+@:rtti
 @:autoBuild(PacketMacro.build ())
-class SlimePacket {
+class SlimePacket {    
     /**
         Get name of packet
         To override by macros
@@ -30,7 +31,6 @@ class SlimePacket {
     /**
         Constructor
     **/
-    public function new () {
-       // SlimePacketParser.Register (this);
+    public function new () {       
     }
 }

@@ -99,62 +99,7 @@ class PacketMacro {
         for (f in fields) {
             var fieldType = GetFieldType (f);            
             if (fieldType == null) continue;            
-            res.push ({ Name : f.name, TypeInfo : fieldType });
-
-          /*  switch (f.kind) {
-                case FVar(t,_): {
-                    var found = false;
-                    for (m in f.meta) {
-                        if (m.name == 'Serialize') {
-                            found = true;
-                            break;
-                        }
-                    }
-
-                    if (!found) continue;                     
-
-                    switch (t) {
-                        case TPath(e): {                            
-                            var info = new VarInfo ();
-                            info.Name = f.name;
-
-                            var fieldType = Context.getType (e.name);                            
-
-                            switch (fieldType) {
-                                case TInst (tp, pr): {
-                                    if (tp.get ().name == 'Array') {                                        
-                                       info.ValType = TypeInfo.ARRAY;
-                                       for (par in tp.get ().params) {
-                                           switch (par.t) {
-                                               case TInst(atp, apr): {
-                                                   //trace (atp);
-                                               }
-                                               default: {}
-                                           }
-                                       }
-                                    } else if (tp.get ().superClass.t.get ().name == 'SlimePacket') {
-                                       info.ValType = TypeInfo.SLIME_PACKET;
-                                    }
-                                }
-                                case TType (tp, pr): {
-                                    info.ValType = e.name;
-                                }
-                                case TAbstract (tp, pr): {
-                                    info.ValType = e.name;
-                                }
-                                default: {
-                                    
-                                }
-                            }
-                                                        
-                            res.push (info);
-                        }
-                        default: {                           
-                        }
-                    }
-                }
-                default: {}
-            }*/
+            res.push ({ Name : f.name, TypeInfo : fieldType });          
         }        
         
         return res;

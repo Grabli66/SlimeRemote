@@ -18,11 +18,6 @@ class ClientWebSocket {
     private var _host : String;
 
     /**
-        Protocol to parse data
-    **/
-    private var _protocol : SlimeProtocol;
-
-    /**
         On open callback
     **/
     public var OnOpen : Void -> Void;
@@ -36,18 +31,14 @@ class ClientWebSocket {
         Constructor
     **/
     public function new (host : String) {
-        _host = host;
-        _protocol = new SlimeProtocol ();
-        _protocol.OnPacket = function (packet : SlimePacket) {            
-            OnPacket (packet);
-        }
+        _host = host;        
     }
 
     /**
         Open connection
     **/
     public function Open () : Void {
-        _socketWs = new WebSocket ('ws://${_host}:${SlimeProtocol.DEFAULT_PORT}');
+        _socketWs = new WebSocket ('ws://${_host}:${Global.DEFAULT_PORT}');
         _socketWs.binaryType = BinaryType.ARRAYBUFFER;
         _socketWs.onopen = function () {
             OnOpen ();
@@ -58,8 +49,13 @@ class ClientWebSocket {
         }
 
         _socketWs.onmessage = function (e) {
-            var binaryData = BinaryData.FromArrayBuffer(e.data);
-            _protocol.AddBytes (binaryData);
+            try {
+                var binaryData = BinaryData.FromArrayBuffer(e.data);
+                var pack = SlimePacketParser.FromBinary (binaryData);
+                OnPacket (pack);
+            } catch (e : Dynamic) {
+                trace (e);
+            }
         }
 
         _socketWs.onerror = function (e) {
@@ -71,7 +67,7 @@ class ClientWebSocket {
         Send packet
     **/
     public function Send (packet : SlimePacket) : Void {
-        var binaryData = _protocol.PacketToBinaryData (packet);
+        var binaryData = SlimePacketParser.ToBinary (packet);
         _socketWs.send (binaryData.ToArrayBufferView ());
     } 
 }

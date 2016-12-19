@@ -101,11 +101,6 @@ class InternalHandler {
     private var _frameType : Int;
 
     /**
-        Slime protocol
-    **/
-    private var _protocol : SlimeProtocol;
-
-    /**
         When client send close frame
     **/
     public var OnClose : Socket -> Void;
@@ -212,7 +207,12 @@ class InternalHandler {
                     res.AddUint8 (d);
                 }
 
-                _clientHandler.OnData (res);
+                try {                    
+                    var pack = SlimePacketParser.FromBinary (res);                    
+                    _clientHandler.OnPacket (pack);
+                } catch (e : Dynamic) {
+                    trace (e);
+                }
             }
         }      
         
@@ -248,8 +248,7 @@ class InternalHandler {
         _clientHandler = new ClientHandler (this);
         _state = HandlerState.HANDSHAKE; 
         _workState = WorkState.FRAME_TYPE;     
-        _headers = new Map<String, String> ();
-        _protocol = new SlimeProtocol ();        
+        _headers = new Map<String, String> ();        
     }
 
     /**
@@ -263,11 +262,15 @@ class InternalHandler {
         Send slime packet
     **/
     public function Send (packet : SlimePacket) : Void {
-        var data = _protocol.PacketToBinaryData (packet);
-        var frame = new BinaryData ();
-        frame.AddUint8 (0x82);  // FIN, BINARY
-        frame.AddUint8 (data.Length ());             
-        frame.AddBinaryData (data);        
-        _socket.output.write (frame.ToBytes ());
+        try {
+            var data = SlimePacketParser.ToBinary (packet);
+            var frame = new BinaryData ();
+            frame.AddUint8 (0x82);  // FIN, BINARY
+            frame.AddUint8 (data.Length ());             
+            frame.AddBinaryData (data);        
+            _socket.output.write (frame.ToBytes ());
+        } catch (e : Dynamic) {
+            trace (e);
+        }
     }
 }

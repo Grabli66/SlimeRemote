@@ -198,7 +198,8 @@ class SlimePacketParser {
     /**
         Register handler for packet
     **/
-    public static function Register (name : String) : Int {        
+    public static function Register (name : String) : Int {  
+        trace (name);      
         _knownPackets[name] = _counter;
         _knownPacketsResolved[_counter] = Type.resolveClass (name);            
         _counter++;

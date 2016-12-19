@@ -159,6 +159,44 @@ BinaryData.prototype = {
 	}
 	,__class__: BinaryData
 };
+var ClientWebSocket = function(host) {
+	this._host = host;
+};
+$hxClasses["ClientWebSocket"] = ClientWebSocket;
+ClientWebSocket.__name__ = true;
+ClientWebSocket.prototype = {
+	Open: function() {
+		var _gthis = this;
+		this._socketWs = new WebSocket("ws://" + this._host + ":" + 65200);
+		this._socketWs.binaryType = "arraybuffer";
+		this._socketWs.onopen = function() {
+			_gthis.OnOpen();
+		};
+		this._socketWs.onclose = function() {
+			console.log("CLOSE");
+		};
+		this._socketWs.onmessage = function(e) {
+			try {
+				var pack = SlimePacketParser.FromBinary(BinaryData.FromArrayBuffer(e.data));
+				_gthis.OnPacket(pack);
+			} catch( e1 ) {
+				if (e1 instanceof js__$Boot_HaxeError) e1 = e1.val;
+				console.log(e1);
+			}
+		};
+		this._socketWs.onerror = function(e2) {
+			console.log(e2);
+		};
+	}
+	,Send: function(packet) {
+		var binaryData = SlimePacketParser.ToBinary(packet);
+		this._socketWs.send(binaryData.ToArrayBufferView());
+	}
+	,__class__: ClientWebSocket
+};
+var Global = function() { };
+$hxClasses["Global"] = Global;
+Global.__name__ = true;
 var HxOverrides = function() { };
 $hxClasses["HxOverrides"] = HxOverrides;
 HxOverrides.__name__ = true;
@@ -508,22 +546,22 @@ TestPacket.prototype = $extend(SlimePacket.prototype,{
 	}
 	,__class__: TestPacket
 });
-var TestSerialize = function() { };
-$hxClasses["TestSerialize"] = TestSerialize;
-TestSerialize.__name__ = true;
-TestSerialize.main = function() {
-	var items = [];
-	var tm = new Date().getTime();
-	var _g = 0;
-	while(_g < 1) {
-		_g++;
-		var pack = new TestPacket();
-		pack.x = 125;
-		pack.x = 125;
-		items.push(SlimePacketParser.FromBinary(pack.ToData()));
-	}
-	tm = new Date().getTime() - tm;
-	console.log(tm);
+var TestWsClient = function() { };
+$hxClasses["TestWsClient"] = TestWsClient;
+TestWsClient.__name__ = true;
+TestWsClient.TestClientWs = function() {
+	var client = new ClientWebSocket("localhost");
+	client.OnOpen = function() {
+		client.Send(new TestPacket());
+		client.Send(new TestPacket());
+	};
+	client.OnPacket = function(packet) {
+		console.log((js_Boot.__cast(packet , TestPacket)).x);
+	};
+	client.Open();
+};
+TestWsClient.main = function() {
+	TestWsClient.TestClientWs();
 };
 var _$UInt16_UInt16_$Impl_$ = {};
 $hxClasses["_UInt16.UInt16_Impl_"] = _$UInt16_UInt16_$Impl_$;
@@ -948,8 +986,6 @@ String.prototype.__class__ = $hxClasses["String"] = String;
 String.__name__ = true;
 $hxClasses["Array"] = Array;
 Array.__name__ = true;
-Date.prototype.__class__ = $hxClasses["Date"] = Date;
-Date.__name__ = ["Date"];
 var Int = $hxClasses["Int"] = { __name__ : ["Int"]};
 var Dynamic = $hxClasses["Dynamic"] = { __name__ : ["Dynamic"]};
 var Float = $hxClasses["Float"] = Number;
@@ -964,6 +1000,7 @@ if(ArrayBuffer.prototype.slice == null) {
 	ArrayBuffer.prototype.slice = js_html_compat_ArrayBuffer.sliceImpl;
 }
 var Uint8Array = $global.Uint8Array || js_html_compat_Uint8Array._new;
+Global.DEFAULT_PORT = 65200;
 _$KnownType_KnownType_$Impl_$.UINT8 = 0;
 _$KnownType_KnownType_$Impl_$.UINT16 = 1;
 _$KnownType_KnownType_$Impl_$.UINT32 = 2;
@@ -991,5 +1028,5 @@ TestPacket.__meta__ = { fields : { x : { Serialize : null}, y : { Serialize : nu
 TestPacket._register = SlimePacketParser.Register("TestPacket");
 js_Boot.__toStr = ({ }).toString;
 js_html_compat_Uint8Array.BYTES_PER_ELEMENT = 1;
-TestSerialize.main();
+TestWsClient.main();
 })(typeof window != "undefined" ? window : typeof global != "undefined" ? global : typeof self != "undefined" ? self : this);

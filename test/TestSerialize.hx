@@ -6,13 +6,10 @@ class TestSerialize {
     public static function main () : Void {        
         var items = new Array<SlimePacket> ();
         var tm = Date.now ().getTime ();
-        for (i in 0...100000) {
+        for (i in 0...1) {
             var pack = new TestPacket ();
             pack.x = 125;
-            pack.x = 125;
-            pack.Arr.push (22);
-            pack.Arr.push (24);
-            pack.Arr.push (26);
+            pack.x = 125;            
             //trace (pack.ToData ().ToArray ());
             items.push (SlimePacketParser.FromBinary (pack.ToData ()));
         }
@@ -23,7 +20,7 @@ class TestSerialize {
         //trace (tp.x);
         //trace (tp.Arr);
 
-        var items1 = new Array<TestBitsPacket> ();
+        /*var items1 = new Array<TestBitsPacket> ();
         var ser = new hxbit.Serializer();                     
         
         var tm = Date.now ().getTime ();
@@ -37,7 +34,7 @@ class TestSerialize {
             items1.push (ser.unserialize (ser.serialize(pack), TestBitsPacket));
         }
         tm = Date.now ().getTime () - tm;
-        trace (tm);
+        trace (tm);*/
 
         //trace (items1.length);
         //trace (BinaryData.FromArrayBuffer (items1[0].getData ()).ToArray ());

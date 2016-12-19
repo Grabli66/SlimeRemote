@@ -1,9 +1,7 @@
 package;
 
 class TestWsClient {
-    private static function TestClientWs () {        
-       SlimePacketParser.GetInstance ().Register (TestPacket.TYPE, TestPacket.FromData);
-
+    private static function TestClientWs () {               
        var client = new ClientWebSocket ("localhost");
        client.OnOpen = function () {
            client.Send (new TestPacket ());

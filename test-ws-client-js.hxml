@@ -6,5 +6,6 @@
 -cp src/SlimeWebSocket
 -cp src/SlimeWebSocket/ClientWebSocket
 -cp test
+-cp test/Packets
 -main TestWsClient
 -js out/client/index.js

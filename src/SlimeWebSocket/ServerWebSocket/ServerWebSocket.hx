@@ -30,9 +30,9 @@ class ServerWebSocket {
         Constructor
     **/
     public function new (onAccept : AcceptHandler) 
-    {
+    {        
         _socket = new Socket ();
-        _onAccept = onAccept;
+        _onAccept = onAccept;        
     }
 
     /**
@@ -40,7 +40,7 @@ class ServerWebSocket {
     **/
     public function Start () {
         // TODO: bind to some IP
-        _socket.bind (new Host("localhost"), SlimeProtocol.DEFAULT_PORT);                
+        _socket.bind (new Host("localhost"), Global.DEFAULT_PORT);                
         _socket.setBlocking (false);
         _socket.listen (DEFAULT_CONNECTIONS);
 

@@ -1,0 +1,4 @@
+-cp src/BinaryData
+-cp test
+-main TestThreadServer
+-cpp out/threadserver

@@ -8,5 +8,8 @@ class TestBitsPacket implements hxbit.Serializable {
     @:s
     public var Arr : Array<Int> = new Array<Int> ();
 
+    /*@:s
+    public var Pack : TestBit2 = new TestBit2 ();*/
+
     public function new () {}
 }

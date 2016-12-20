@@ -11,6 +11,17 @@ class BinaryData {
     private var _buffer = new Array<UInt8> ();
 
     /**
+        Convert binary data to utf-8 string
+    **/
+    public static function ToUtf8String (data : BinaryData) : String {
+        var utf = new Utf8 ();
+        for (b in data) {                 
+            utf.addChar (b);
+        }        
+        return Utf8.decode (utf.toString ());
+    }    
+
+    /**
         Create binary data from array of byte
     **/
     public static function FromArray (data : Array<UInt8>) : BinaryData 
@@ -22,7 +33,7 @@ class BinaryData {
     /**
         Convert array buffer to Array UInt8
     **/
-    private static inline function ConvertToArrayUInt8 (data : Bytes) : Array<UInt8> {
+    private static inline function ConvertToArrayUInt8 (data : Bytes, ?len : Int = null) : Array<UInt8> {
         #if js
 
         var dat = cast (data.getData (), js.html.Uint8Array);
@@ -35,7 +46,7 @@ class BinaryData {
 
         #end
 
-        #if !js
+        #if !js        
         return data.getData ();
         #end
     }
@@ -73,7 +84,7 @@ class BinaryData {
     /**
         Create binary data from Bytes
     **/
-    public static function FromBytes (data : Bytes) : BinaryData 
+    public static function FromBytes (data : Bytes, ?len : Int = null) : BinaryData 
     {        
         var res = new BinaryData (ConvertToArrayUInt8 (data));
         return res;    
@@ -190,6 +201,31 @@ class BinaryData {
     **/
     public function GetUint32 (pos : Int) : UInt32 {
         return (_buffer[pos] << 24) + (_buffer[pos + 1] << 16) + (_buffer[pos + 2] << 8) + (_buffer[pos + 3]);
+    }
+
+    /**
+        Read line string from buffer
+    **/
+    public function GetLine () : String {
+        var lastB: UInt8 = 0;
+        for (i in 0..._buffer.length) {
+            var b:UInt8 = _buffer[i];            
+            if ((lastB == 0x0D) && (b == 0x0A)) {                
+                var binary = Cut (0, i + 1);
+                var res = new BinaryData ();
+                for (bb in binary) {
+                    if ((bb == 0x0D) || (bb == 0x0A)) continue;
+                    res.AddUint8 (bb);
+                }
+
+                if (res.Length () < 1) return "";
+                trace (res.ToArray ());
+                return BinaryData.ToUtf8String (res);
+            }
+            lastB = b;
+        }
+
+        return null;
     }
 
     /**
